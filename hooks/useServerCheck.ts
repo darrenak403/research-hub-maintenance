@@ -3,32 +3,29 @@
 import {useEffect} from 'react'
 
 const MAIN_URL = 'https://rblrepository.site'
+const PROBE_URL = `${MAIN_URL}/favicon.ico`
 const INTERVAL_MS = 10_000
 
 // Middleware đã xử lý token guard server-side.
 // Hook này chỉ lo polling: khi Cloudflare rule tắt → redirect về main.
+//
+// Dùng Image thay vì fetch để tránh CORS block:
+//   - Maintenance BẬT  → Cloudflare trả về HTML → ảnh lỗi → onerror → chờ tiếp
+//   - Maintenance TẮT  → favicon.ico load OK    → onload  → về main
 export function useServerCheck() {
   useEffect(() => {
     let redirecting = false
 
-    const check = async () => {
+    const check = () => {
       if (redirecting) return
-      try {
-        const res = await fetch(`${MAIN_URL}/?ts=${Date.now()}`, {
-          method: 'HEAD',
-          mode: 'no-cors',
-          redirect: 'manual',
-          cache: 'no-store',
-        })
-        // Maintenance BẬT → Cloudflare redirect → opaqueredirect
-        // Maintenance TẮT → không redirect    → opaque → về main
-        if (res.type !== 'opaqueredirect') {
-          redirecting = true
-          window.location.href = MAIN_URL
-        }
-      } catch {
-        // Lỗi mạng — bỏ qua, thử lại sau
+      const img = new Image()
+      img.onload = () => {
+        if (redirecting) return
+        redirecting = true
+        window.location.href = MAIN_URL
       }
+      img.onerror = () => { /* vẫn đang bảo trì, thử lại sau */ }
+      img.src = `${PROBE_URL}?ts=${Date.now()}`
     }
 
     check()

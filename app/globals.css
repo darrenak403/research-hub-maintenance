@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -53,13 +53,13 @@
     --radius: 0.5rem;
 
     /* Desktop: public/background.png — mobile override bên dưới + AppBackground (useMobile) */
-    --app-background-image: url("/background.png");
+    --app-background-image: url('/background.png');
   }
 
   /* Cùng breakpoint với hooks/useMobile.tsx (MOBILE_BREAKPOINT − 1) */
   @media (max-width: 767px) {
     :root {
-      --app-background-image: url("/mobile-background.png");
+      --app-background-image: url('/mobile-background.png');
     }
   }
 
@@ -140,7 +140,7 @@
     background-color: var(--background);
     background-image: var(--app-background-image);
     background-size: cover;
-    background-position: center;
+    background-position: center 35%;
     background-repeat: no-repeat;
     background-attachment: fixed;
   }
@@ -198,29 +198,29 @@
 }
 
 /* Success toast */
-[data-sonner-toast][data-type="success"] {
+[data-sonner-toast][data-type='success'] {
   color: var(--primary) !important;
 }
 
-[data-sonner-toast][data-type="success"] [data-title] {
+[data-sonner-toast][data-type='success'] [data-title] {
   color: var(--primary) !important;
 }
 
 /* Error toast */
-[data-sonner-toast][data-type="error"] {
+[data-sonner-toast][data-type='error'] {
   color: var(--primary) !important;
 }
 
-[data-sonner-toast][data-type="error"] [data-title] {
+[data-sonner-toast][data-type='error'] [data-title] {
   color: var(--primary) !important;
 }
 
 /* Info toast */
-[data-sonner-toast][data-type="info"] {
+[data-sonner-toast][data-type='info'] {
   color: var(--primary) !important;
 }
 
-[data-sonner-toast][data-type="info"] [data-title] {
+[data-sonner-toast][data-type='info'] [data-title] {
   color: var(--primary) !important;
 }
 

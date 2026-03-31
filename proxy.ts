@@ -4,12 +4,12 @@ const MAIN_URL = 'https://rblrepository.site'
 const COOKIE_NAME = 'maint_access'
 const COOKIE_MAX_AGE = 60 * 60 * 4 // 4 giờ
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { searchParams } = req.nextUrl
   const key = searchParams.get('key')
   const expectedKey = process.env.MAINTENANCE_KEY
 
-  // Có key hợp lệ trên URL → validate, set cookie, xóa key khỏi URL
+  // Có key trên URL → validate, set cookie, xóa key khỏi URL
   if (key !== null) {
     if (key === expectedKey) {
       const clean = req.nextUrl.clone()
@@ -27,7 +27,7 @@ export function middleware(req: NextRequest) {
     return NextResponse.redirect(MAIN_URL)
   }
 
-  // Không có key trên URL → kiểm tra cookie
+  // Không có key → kiểm tra cookie
   const cookie = req.cookies.get(COOKIE_NAME)
   if (!cookie) {
     return NextResponse.redirect(MAIN_URL)

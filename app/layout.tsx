@@ -18,6 +18,7 @@ const quicksand = Quicksand({
 export const metadata: Metadata = {
   title: "Maintenance RBL Client",
   description: "Maintenance RBL Client application",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({

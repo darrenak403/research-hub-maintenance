@@ -4,7 +4,7 @@ import {useEffect} from 'react'
 
 const MAIN_URL = 'https://rblrepository.site'
 const PROBE_URL = `${MAIN_URL}/favicon.ico`
-const INTERVAL_MS = 10_000
+const INTERVAL_MS = 5_000
 
 // Middleware đã xử lý token guard server-side.
 // Hook này chỉ lo polling: khi Cloudflare rule tắt → redirect về main.
@@ -24,7 +24,9 @@ export function useServerCheck() {
         redirecting = true
         window.location.href = MAIN_URL
       }
-      img.onerror = () => { /* vẫn đang bảo trì, thử lại sau */ }
+      img.onerror = () => {
+        /* vẫn đang bảo trì, thử lại sau */
+      }
       img.src = `${PROBE_URL}?ts=${Date.now()}`
     }
 

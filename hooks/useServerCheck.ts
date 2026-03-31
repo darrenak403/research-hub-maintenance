@@ -3,38 +3,31 @@
 import {useEffect} from 'react'
 
 const MAIN_URL = 'https://rblrepository.site'
-const MAINTENANCE_HOST = 'maintenance.rblrepository.site'
-const ACCESS_KEY = 'eKf8SwC0+qOOuDlZ0Ngf1uXvyqC/eF7B41MGP1JZHMM='
 const INTERVAL_MS = 10_000
 
-/**
- * Bảo vệ 2 lớp:
- * 1. Kiểm tra `?key=` — nếu không khớp, redirect về trang chính ngay.
- *    (chặn người dùng gõ thẳng maintenance.rblrepository.site)
- * 2. Thăm dò server chính mỗi `INTERVAL_MS` ms — khi Cloudflare rule tắt,
- *    `response.url` không còn chứa `MAINTENANCE_HOST` → tự redirect về.
- */
+// Middleware đã xử lý token guard server-side.
+// Hook này chỉ lo polling: khi Cloudflare rule tắt → redirect về main.
 export function useServerCheck() {
   useEffect(() => {
-    // Lớp 1: token guard
-    const key = new URLSearchParams(window.location.search).get('key')
-    if (key !== ACCESS_KEY) {
-      window.location.replace(MAIN_URL)
-      return
-    }
+    let redirecting = false
 
-    // Lớp 2: polling
     const check = async () => {
+      if (redirecting) return
       try {
         const res = await fetch(`${MAIN_URL}/?ts=${Date.now()}`, {
-          redirect: 'follow',
+          method: 'HEAD',
+          mode: 'no-cors',
+          redirect: 'manual',
           cache: 'no-store',
         })
-        if (!res.url.includes(MAINTENANCE_HOST)) {
+        // Maintenance BẬT → Cloudflare redirect → opaqueredirect
+        // Maintenance TẮT → không redirect    → opaque → về main
+        if (res.type !== 'opaqueredirect') {
+          redirecting = true
           window.location.href = MAIN_URL
         }
       } catch {
-        // Lỗi mạng / CORS — bỏ qua, thử lại sau
+        // Lỗi mạng — bỏ qua, thử lại sau
       }
     }
 
